@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">UserAdmin</string>
+    <string name="user">USER</string>
+    <string name="admin">ADMIN</string>
+    <string name="email">E Mail Id</string>
+    <string name="name">User Name</string>
+    <string name="pass">Password</string>
+    <string name="cpass">Confirm Password</string>
+</resources>

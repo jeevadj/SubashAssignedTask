@@ -37,7 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class AfterLogin extends AppCompatActivity
-{
+{   ArrayList<String> keyList = new ArrayList<>();
     ImageView img;
     String uploadtext,username;
     FloatingActionButton upload,fab1,fab2;
@@ -72,6 +72,7 @@ public class AfterLogin extends AppCompatActivity
         count =0;
         Firebase.setAndroidContext(this);
         fb_db = new Firebase(BaseUrl );
+        keyList.clear();
 
         caller= getIntent().getExtras().getString("caller");
 
@@ -169,6 +170,53 @@ public class AfterLogin extends AppCompatActivity
 
 
     }
+
+    @Override
+    protected void onResume() {
+        itemArrayAdapter.setOnItemClickListener(new ItemAdapter.MyClickListener() {
+            @Override
+            public void onItemClick(final int position, View v) {
+               if(caller.equals("Admin_Login")){
+                   AlertDialog.Builder alertDialog = new AlertDialog.Builder(AfterLogin.this)
+                           .setTitle("Delete post...")
+                           .setMessage("Do you want to delete the post?")
+                           .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                               @Override
+                               public void onClick(DialogInterface dialogInterface, int i) {
+                                    fb_db.child("Cards").child(keyList.get(position)).removeValue(new Firebase.CompletionListener() {
+                                        @Override
+                                        public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                                            StorageReference sr = FirebaseStorage.getInstance().getReference().child("RECYCLER").child(keyList.get(position));
+                                            sr.delete().addOnSuccessListener(AfterLogin.this, new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(AfterLogin.this, "Post Deleted", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(AfterLogin.this,AfterLogin.class);
+                                                    intent.putExtra("name",username);
+                                                    intent.putExtra("caller",caller);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
+                                            });
+
+                                        }
+                                    });
+                               }
+                           })
+                           .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                               @Override
+                               public void onClick(DialogInterface dialogInterface, int i) {
+                                   Toast.makeText(AfterLogin.this, "Cancelled...", Toast.LENGTH_SHORT).show();
+                               }
+                           });
+                   alertDialog.create();
+                   alertDialog.show();
+               }
+            }
+        });
+        super.onResume();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -320,6 +368,7 @@ public class AfterLogin extends AppCompatActivity
 
                     for (DataSnapshot child: dataSnapshot.getChildren()){
                         System.out.println("bow "+child.getKey());
+                        keyList.add(0,child.getKey());
                         ImgAdapter imgAdapter = child.getValue(ImgAdapter.class);
                         itemAdapter.add(0,new Adapter(imgAdapter.getText(),imgAdapter.getUrl()));
                     }

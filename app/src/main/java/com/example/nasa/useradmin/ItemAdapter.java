@@ -21,6 +21,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public int layoutId ;
     public static ArrayList<Adapter> itemlist;
     static Context context1;
+    public static MyClickListener myClickListener;
 
     public ItemAdapter(int layoutId, ArrayList<Adapter> itemlist) {
         this.layoutId = layoutId;
@@ -67,6 +68,20 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             img = (ImageView)itemView.findViewById(R.id.cardImage);
             tv=(TextView)itemView.findViewById(R.id.cardText);
             System.out.println("boww"+itemlist.size());
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    myClickListener.onItemClick(getAdapterPosition(),view);
+                }
+            });
         }
+    }
+    public interface MyClickListener
+    {
+        void onItemClick(int position, View v);
+    }
+    public void setOnItemClickListener(MyClickListener myClickListener) {
+        this.myClickListener = myClickListener;
     }
 }

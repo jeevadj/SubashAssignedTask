@@ -51,13 +51,16 @@ public class User_Login extends AppCompatActivity
                    }
                });
 
-                fb_db = new Firebase(BaseUrl);
-                fb_db.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            User_Adapter obj = postSnapshot.getValue(User_Adapter.class);
-                            {
+                if(s1.isEmpty()||s2.isEmpty()){
+                    Toast.makeText(User_Login.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
+                }else{
+                    fb_db = new Firebase(BaseUrl);
+                    fb_db.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                User_Adapter obj = postSnapshot.getValue(User_Adapter.class);
+
                                 if (obj.getS1().equals(s1) && obj.getS3().equals(s2)) {
                                     flag = true;
                                     Intent j = new Intent(User_Login.this, AfterLogin.class);
@@ -65,6 +68,7 @@ public class User_Login extends AppCompatActivity
                                     Bundle extras = new Bundle();
                                     extras.putString("email", obj.getS1());
                                     extras.putString("name", obj.getS2());
+                                    extras.putString("caller","User_Login");
                                     j.putExtras(extras);
 
                                     Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
@@ -72,18 +76,20 @@ public class User_Login extends AppCompatActivity
                                     startActivity(j);
                                     finish();
                                 }
+
+                            }
+                            if (flag == false) {
+                                progressDialog.dismiss();
+                                Toast.makeText(getApplicationContext(), "Invalid Credentialz", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        if (flag == false) {
-                            Toast.makeText(getApplicationContext(), "Invalid Credentialz", Toast.LENGTH_SHORT).show();
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+
                         }
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-
-                    }
-                });
+                    });
+                }
             }
         });
     }

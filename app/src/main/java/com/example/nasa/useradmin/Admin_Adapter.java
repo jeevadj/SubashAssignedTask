@@ -9,8 +9,9 @@ public class Admin_Adapter
 
     String s1;
     String s2;
+
+
     String s3;
-    String s4;
 
     public String getS1() {
         return s1;
@@ -43,5 +44,8 @@ public class Admin_Adapter
     public void setS4(String s4) {
         this.s4 = s4;
     }
+
+    String s4;
+
 
 }

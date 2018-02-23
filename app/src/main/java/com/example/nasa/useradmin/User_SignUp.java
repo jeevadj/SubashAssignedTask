@@ -51,6 +51,7 @@ public class User_SignUp extends AppCompatActivity {
                 }
                 else if((s3.equals(s4)))
                 {
+                    System.out.println("Bow "+s1+s2+s3+s4);
                     new MyTask().execute();
                 }
                 else
@@ -73,46 +74,72 @@ public class User_SignUp extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings)
         {
-            fb_db = new Firebase(BaseUrl + "User/");
-            fb_db.addListenerForSingleValueEvent(new ValueEventListener()
+            fb_db = new Firebase(BaseUrl);
+            System.out.println("bow Came in task");
+            fb_db.child("User").addListenerForSingleValueEvent(new ValueEventListener()
             {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        Admin_Adapter obj = postSnapshot.getValue(Admin_Adapter.class);
-                        String Name = obj.getS1();
-                        if (Name.equals(s1)) {
-                            flag = false;
+                    System.out.println("bow Came in checking condition"+dataSnapshot.getChildrenCount());
+                    if(dataSnapshot.hasChildren()){
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            User_Adapter obj = postSnapshot.getValue(User_Adapter.class);
+                            String Name = obj.getS1();
+                            if (Name.equals(s1)) {
+                                flag = false;
+                                progressDialog.dismiss();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Email Already exists.\n Try with new Email id", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                        if (flag)
+                        {
+                            User_Adapter obj = new User_Adapter();
+                            obj.setS1(s1);
+                            obj.setS2(s2);
+                            obj.setS3(s3);
+                            obj.setS4(s4);
+
+                            String[] splited = s1.split("@");
+
+
+                            fb_db = new Firebase(BaseUrl);
+                            fb_db.child("User").child(splited[0] + "_Data").setValue(obj);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getApplicationContext(), "User_Name Already exists", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(User_SignUp.this, "Successfully Registered", Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+                            Intent i = new Intent(User_SignUp.this, User_Activity.class);
+                            progressDialog.dismiss();
+                            startActivity(i);
+                            finish();
+
+
                         }
                     }
-                    if (flag)
-                    {
+                    else{
                         User_Adapter obj = new User_Adapter();
                         obj.setS1(s1);
                         obj.setS2(s2);
                         obj.setS3(s3);
                         obj.setS4(s4);
 
+                        String[] splited = s1.split("@");
+                        fb_db = new Firebase(BaseUrl);
+                        fb_db.child("User").child(splited[0]+ "_Data").setValue(obj);
                         Intent i = new Intent(User_SignUp.this, User_Activity.class);
                         progressDialog.dismiss();
                         startActivity(i);
                         finish();
-
-                        fb_db = new Firebase(BaseUrl);
-                        fb_db.child("User").child(s1 + "_Data").setValue(obj);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(User_SignUp.this, "Successfully Registered", Toast.LENGTH_SHORT).show();
-                            }
-                        });
                     }
+
                 }
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {

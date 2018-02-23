@@ -32,6 +32,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -41,6 +42,7 @@ public class AfterLogin extends AppCompatActivity
     String uploadtext,username;
     FloatingActionButton upload,fab1,fab2;
     RecyclerView recyclerView;
+    int count = 0;
    int a = 1;
     ProgressDialog progressDialog;
     String BaseUrl="https://broadcaster-68002.firebaseio.com/";
@@ -49,6 +51,7 @@ public class AfterLogin extends AppCompatActivity
     public ItemAdapter itemArrayAdapter;
     RecyclerView.LayoutManager layoutManager;
     Date currentTime ;
+    String caller;
     Uri imageUri,selectedImageUri;
 
     private static final int PICK_Camera_IMAGE=2;
@@ -66,11 +69,20 @@ public class AfterLogin extends AppCompatActivity
         layoutManager =new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         upload=(FloatingActionButton)findViewById(R.id.up);
-
+        count =0;
         Firebase.setAndroidContext(this);
         fb_db = new Firebase(BaseUrl );
 
+        caller= getIntent().getExtras().getString("caller");
+
+        if(caller.equals("Admin_Login")){
+            upload.setVisibility(View.VISIBLE);
+        }else if(caller.equals("User_Login")){
+            upload.setVisibility(View.GONE);
+        }
+
         username = getIntent().getExtras().getString("name");
+
 
 
 
@@ -241,10 +253,11 @@ public class AfterLogin extends AppCompatActivity
             adapter.setText(uploadtext);
             adapter.setUrl("");
             System.out.println("bowww "+adapter);
-            fb_db.child("Cards").child(username).child(currentTime.toString()).setValue(adapter);
+            fb_db.child("Cards").child(currentTime.toString()).setValue(adapter);
 
             Intent intent = new Intent(AfterLogin.this,AfterLogin.class);
             intent.putExtra("name",username);
+            intent.putExtra("caller",caller);
             startActivity(intent);
             finish();
 
@@ -283,10 +296,11 @@ public class AfterLogin extends AppCompatActivity
                     ImgAdapter imgAdapter = new ImgAdapter();
                     imgAdapter.setUrl(url);
                     imgAdapter.setText(uploadtext);
-                    fb_db.child("Cards").child(username).child(currentTime.toString()).setValue(imgAdapter);
+                    fb_db.child("Cards").child(currentTime.toString()).setValue(imgAdapter);
                     progressDialog.dismiss();
                     Intent intent = new Intent(AfterLogin.this,AfterLogin.class);
                     intent.putExtra("name",username);
+                    intent.putExtra("caller",caller);
                     startActivity(intent);
                     finish();
 
@@ -300,7 +314,7 @@ public class AfterLogin extends AppCompatActivity
 
         @Override
         protected String doInBackground(String... strings) {
-            fb_db.child("Cards").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+            fb_db.child("Cards").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -325,5 +339,15 @@ public class AfterLogin extends AppCompatActivity
         }
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if(count == 1){
+            Toast.makeText(AfterLogin.this, "Press again to Exit...", Toast.LENGTH_SHORT).show();
+        }else if(count == 2){
+            finish();
+        }else{
+            count++;
+        }
+        super.onBackPressed();
+    }
 }

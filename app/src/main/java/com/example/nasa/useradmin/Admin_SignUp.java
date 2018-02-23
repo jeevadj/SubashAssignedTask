@@ -113,19 +113,21 @@ public class Admin_SignUp extends AppCompatActivity
                         obj.setS3(s3);
                         obj.setS4(s4);
 
-                        Intent i = new Intent(Admin_SignUp.this, Admin_Activity.class);
-                        progressDialog.dismiss();
-                        startActivity(i);
-                        finish();
-
+                        String[] splited = s1.split("@");
                         fb_db = new Firebase(BaseUrl);
-                        fb_db.child("Admin").child(s1 + "_Data").setValue(obj);
+                        fb_db.child("Admin").child(splited[0] + "_Data").setValue(obj);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 Toast.makeText(Admin_SignUp.this, "Successfully Registered", Toast.LENGTH_SHORT).show();
                             }
                         });
+
+                        Intent i = new Intent(Admin_SignUp.this, Admin_Activity.class);
+                        progressDialog.dismiss();
+                        startActivity(i);
+                        finish();
+
                     }
                 }
 

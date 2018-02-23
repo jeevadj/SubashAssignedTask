@@ -61,6 +61,7 @@ public class Admin_Login extends AppCompatActivity
                                     Bundle extras = new Bundle();
                                     extras.putString("email", obj.getS1());
                                     extras.putString("name", obj.getS2());
+                                    extras.putString("caller","Admin_Login");
                                     j.putExtras(extras);
 
                                     Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
@@ -71,6 +72,7 @@ public class Admin_Login extends AppCompatActivity
                             }
                         }
                         if (flag == false) {
+                            progressDialog.dismiss();
                             Toast.makeText(getApplicationContext(), "Invalid Credentialz", Toast.LENGTH_SHORT).show();
                         }
                     }
